@@ -1,11 +1,18 @@
 import React from "react";
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity} from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  TouchableOpacity
+} from "react-native";
 
-import StatusBar from 'react-native';
+import StatusBar from "react-native";
 
 export default class login extends React.Component {
   static navigationOptions = {
-    title: "LOGIN",
+    title: "LOGIN"
   };
 
   state = {
@@ -34,7 +41,9 @@ export default class login extends React.Component {
               ? "SUCCESSFUL"
               : responseJson.non_field_errors
         });
-        console.log(responseJson);
+
+        if (responseJson.non_field_errors == null)
+          this.props.navigation.navigate("Home", {token: this.state.token});
       })
       .catch(error => {
         console.error(error);
@@ -61,7 +70,7 @@ export default class login extends React.Component {
 
   _onPressButton = () => {
     this.props.navigation.navigate("Registration");
-  }
+  };
 
   render() {
     return (

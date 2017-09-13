@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
 import Login from "./screens/Login";
 import Registration from "./screens/Registration";
+import Home from "./screens/Home";
 import { StackNavigator } from "react-navigation";
 
 class App extends React.Component {
@@ -18,7 +19,6 @@ const styles = StyleSheet.create({
 
 export default StackNavigator({
   Login: { screen: Login },
-  Registration: { screen: Registration }
+  Registration: { screen: Registration },
+  Home: { screen: Home }
 });
-
-
