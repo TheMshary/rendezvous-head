@@ -62,7 +62,7 @@ class EventCreate extends React.Component {
 		});
 	}
 
-	// Error in the form
+	
 	render() {
 		const navigate  = this.props.navigation;
 		return (
@@ -101,12 +101,16 @@ class EventCreate extends React.Component {
 
 class Events extends React.Component {
 
-	static navigationOptions = {
+	static navigationOptions = ({ navigation, screenProps }) => ({
 		title: 'Events',
+		headerRight: <Button
+						title="new event"
+						onPress={()=>{ navigation.navigate('EventCreate'); }}
+						/>,
 		headerStyle: {
 			marginTop: StatusBar.currentHeight
 		},
-	}
+	});
 
 	constructor(props) {
 		super(props);
