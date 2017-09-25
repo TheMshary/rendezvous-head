@@ -32,6 +32,7 @@ export default class Registration extends React.Component {
               ? "Registered"
               : responseJson.non_field_errors
         });
+
         console.log(responseJson);
       })
       .catch(error => {
@@ -62,7 +63,7 @@ export default class Registration extends React.Component {
       <View style={styles.container}>
         <TextInput
           style={{ height: 40 }}
-          placeholder="UserName"
+          placeholder="Username"
           onChangeText={textUser => this.setState({ textUser })}
         />
 

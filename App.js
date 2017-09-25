@@ -1,15 +1,16 @@
 import React from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
 import Login from "./screens/Login";
-import Registration from "./screens/Registration";
 import Home from "./screens/Home";
+import Registration from "./screens/Registration";
+import CreateEvent from "./screens/CreateEvent";
 import { StackNavigator } from "react-navigation";
 
-class App extends React.Component {
-  render() {
-    return <Login />;
-  }
-}
+// class App extends React.Component {
+//   render() {
+//     return <Login />;
+//   }
+// }
 
 const styles = StyleSheet.create({
   container: {
@@ -20,5 +21,6 @@ const styles = StyleSheet.create({
 export default StackNavigator({
   Login: { screen: Login },
   Registration: { screen: Registration },
-  Home: { screen: Home }
+  Home: { screen: Home },
+  CreateEvent: { screen: CreateEvent },
 });

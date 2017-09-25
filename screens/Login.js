@@ -5,15 +5,25 @@ import {
   View,
   TextInput,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  StatusBar
 } from "react-native";
+import { observer } from "mobx-react";
+import store from '../Store';
 
-import StatusBar from "react-native";
 
-export default class login extends React.Component {
-  static navigationOptions = {
-    title: "LOGIN"
-  };
+const login = observer(class login extends React.Component {
+  static navigationOptions = ({ navigation, screenProps }) => ({
+    title: "Login",
+    headerRight: (
+      <Button
+        title="Registration"
+        onPress={() => {
+          navigation.navigate("Registration");
+        }}
+      />
+    )
+  });
 
   state = {
     token: "",
@@ -42,8 +52,10 @@ export default class login extends React.Component {
               : responseJson.non_field_errors
         });
 
+        store.token = responseJson.token;
+
         if (responseJson.non_field_errors == null)
-          this.props.navigation.navigate("Home", {token: this.state.token});
+          this.props.navigation.navigate("Home", { token: this.state.token });
       })
       .catch(error => {
         console.error(error);
@@ -68,16 +80,12 @@ export default class login extends React.Component {
     //   });
   };
 
-  _onPressButton = () => {
-    this.props.navigation.navigate("Registration");
-  };
-
   render() {
     return (
       <View style={styles.container}>
         <TextInput
           style={{ height: 40 }}
-          placeholder="UserName"
+          placeholder="Username"
           onChangeText={textUser => this.setState({ textUser })}
         />
 
@@ -96,15 +104,11 @@ export default class login extends React.Component {
           accessibilityLabel="Learn more about this purple button"
         />
 
-        <TouchableOpacity onPress={this._onPressButton}>
-          <Text>Registration!</Text>
-        </TouchableOpacity>
-
         <Text>{this.state.message}</Text>
       </View>
     );
   }
-}
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -114,3 +118,5 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   }
 });
+
+export default login;
