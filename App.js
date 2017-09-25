@@ -33,7 +33,10 @@ import store from './Store';
 
 const login = observer(class login extends React.Component {
   static navigationOptions = {
-    title: "LOGIN"
+    title: "LOGIN",
+    headerStyle: {
+		marginTop: StatusBar.currentHeight
+	},
   };
 
   state = {
@@ -97,10 +100,10 @@ const login = observer(class login extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <View>
         <TextInput
           style={{ height: 40 }}
-          placeholder="UserName"
+          placeholder="Username"
           onChangeText={textUser => this.setState({ textUser })}
         />
 
@@ -179,6 +182,7 @@ const EventCreate = observer(class EventCreate extends React.Component {
 		.catch(error => {
 			console.error(error);
 		});
+		this.props.navigation.navigate('Events');
 	}
 
 	
@@ -267,15 +271,33 @@ const Events = observer(class Events extends React.Component {
 			console.error(error);
 		});
 
-		// return fetch('https://facebook.github.io/react-native/movies.json')
-		//   .then((response) => response.json())
-		//   .then((responseJson) => {
-		//     console.log("responseJson: "+responseJson);
-		//   })
-		//   .catch((error) => {
-		//     console.error(error);
-		//   });
+	}
 
+	componentWillUpdate() {
+		EVENTS_URL = "http://46.101.75.135/event/"
+		// token: beef159c35da3d31f028de76efbd434db4061c10
+		return fetch(EVENTS_URL, {
+				method: 'GET',
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json',
+					'Authorization': "token "+store.token
+				}
+			})
+		.then((response) => response.json())
+		.then((responseJson) => {
+			let ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+			// console.log("responseJson: "+responseJson);
+			this.setState({
+				isLoading: false,
+				dataSource: ds.cloneWithRows(responseJson),
+			}, function() {
+				// do something with new state
+			});
+		})
+		.catch((error) => {
+			console.error(error);
+		});
 	}
 
 	render() {
