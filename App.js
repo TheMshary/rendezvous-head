@@ -224,6 +224,27 @@ const EventCreate = observer(class EventCreate extends React.Component {
 	}
 })
 
+const EventDetail = observer(class EventDetail extends React.Component {
+
+	static navigationOptions = {
+		title: 'Event Detail',
+		headerStyle: {
+			marginTop: StatusBar.currentHeight
+		},
+	}
+	
+	render() {
+		const navigate  = this.props.navigation;
+		const event = this.props.navigation.state.params.event;
+
+		return (
+			<View>
+				<Text>{event.title}</Text>
+			</View>
+		);
+	}
+})
+
 const Events = observer(class Events extends React.Component {
 
 	static navigationOptions = ({ navigation, screenProps }) => ({
@@ -300,6 +321,20 @@ const Events = observer(class Events extends React.Component {
 		});
 	}
 
+	// handlePressList = (event) => {
+	// 	this.props.navigator.navigate("EventDetail", {'event': event});
+	// }
+
+	renderEvent = (event) => {
+		return (
+			<View style={styles.container}>
+				<TouchableOpacity onPress={() => this.props.navigation.navigate("EventDetail", {'event': event})}>
+					<Text>{event.title}</Text>
+				</TouchableOpacity>
+			</View>
+		);
+	}
+
 	render() {
 		if (this.state.isLoading) {
 			return (
@@ -326,7 +361,7 @@ const Events = observer(class Events extends React.Component {
 				/>
 				<ListView
 					dataSource={this.state.dataSource}
-					renderRow={(rowData) => <Text>{rowData.title}</Text>}
+					renderRow={this.renderEvent}
 				/>
 			</View>
 		);
@@ -336,6 +371,7 @@ const Events = observer(class Events extends React.Component {
 export default StackNavigator({
 	login: { screen: login },
 	Events: { screen: Events },
+	EventDetail: { screen: EventDetail },
 	EventCreate: { screen: EventCreate, },
 });
 
