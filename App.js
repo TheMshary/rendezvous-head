@@ -4,6 +4,7 @@ import Login from "./screens/Login";
 import Home from "./screens/Home";
 import Registration from "./screens/Registration";
 import CreateEvent from "./screens/CreateEvent";
+import EventDetails from "./screens/EventDetails";
 import { StackNavigator } from "react-navigation";
 
 // class App extends React.Component {
@@ -23,4 +24,5 @@ export default StackNavigator({
   Registration: { screen: Registration },
   Home: { screen: Home },
   CreateEvent: { screen: CreateEvent },
+  EventDetails: {screen: EventDetails},
 });

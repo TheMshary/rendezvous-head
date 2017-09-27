@@ -50,6 +50,7 @@ const CreateEvent = observer(
         .catch(error => {
           console.error(error);
         });
+        this.props.navigation.navigate('Home');
     }
 
     render() {
