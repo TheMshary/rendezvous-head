@@ -11,7 +11,7 @@ import {
   Input,
   Label
 } from "native-base";
-import Font from "expo";
+import Expo from "expo";
 import { observer } from "mobx-react";
 import store from "../Store";
 
