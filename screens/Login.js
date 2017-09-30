@@ -1,13 +1,17 @@
 import React from "react";
+import { StatusBar } from "react-native";
 import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
+  Container,
   Button,
-  TouchableOpacity,
-  StatusBar
-} from "react-native";
+  Icon,
+  Content,
+  Text,
+  Form,
+  Item,
+  Input,
+  Label
+} from "native-base";
+import Font from "expo";
 import { observer } from "mobx-react";
 import store from "../Store";
 
@@ -17,11 +21,13 @@ const login = observer(
       title: "Login",
       headerRight: (
         <Button
-          title="Registration"
+          transparent
           onPress={() => {
             navigation.navigate("Registration");
           }}
-        />
+        >
+          <Icon ios="ios-person-add" android="md-person-add" />
+        </Button>
       )
     });
 
@@ -60,64 +66,46 @@ const login = observer(
         .catch(error => {
           console.error(error);
         });
-
-      // console.log(this.state.textUser);
-      // console.log(this.state.textPass);
-      // fetch("http://46.101.75.135/event/", {
-      //   method: "GET",
-      //   headers: {
-      //     Accept: "application/json",
-      //     "Content-Type": "application/json",
-      //     "Authorization": "token beef159c35da3d31f028de76efbd434db4061c10"
-      //   }
-      // })
-      //   .then(response => response.json())
-      //   .then(responseJson => {
-      //     console.log(responseJson);
-      //   })
-      //   .catch(error => {
-      //     console.error(error);
-      //   });
     };
+
+    async componentWillMount() {
+      await Expo.Font.loadAsync({
+        Roboto: require("native-base/Fonts/Roboto.ttf"),
+        Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
+        Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf")
+      });
+    }
 
     render() {
       return (
-        <View style={styles.container}>
-          <TextInput
-            style={{ height: 40 }}
-            placeholder="Username"
-            onChangeText={textUser => this.setState({ textUser })}
-          />
+        <Container>
+          <Content padder>
+            <Form>
+              <Item floatingLabel>
+                <Label>Username</Label>
+                <Input onChangeText={textUser => this.setState({ textUser })} />
+              </Item>
+              <Item floatingLabel last>
+                <Label>Password</Label>
+                <Input onChangeText={textPass => this.setState({ textPass })} />
+              </Item>
+            </Form>
 
-          <TextInput
-            style={{ height: 40 }}
-            placeholder="Password"
-            onChangeText={textPass => this.setState({ textPass })}
-          />
+            <Button
+              block
+              onPress={() => {
+                this.onPressLearnMore();
+              }}
+            >
+              <Text>Login</Text>
+            </Button>
 
-          <Button
-            onPress={() => {
-              this.onPressLearnMore();
-            }}
-            title="Login"
-            color="#841584"
-            accessibilityLabel="Learn more about this purple button"
-          />
-
-          <Text>{this.state.message}</Text>
-        </View>
+            <Text>{this.state.message}</Text>
+          </Content>
+        </Container>
       );
     }
   }
 );
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center"
-  }
-});
 
 export default login;

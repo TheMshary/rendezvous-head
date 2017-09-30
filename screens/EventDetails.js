@@ -36,19 +36,13 @@ const EventDetails = observer(
           Authorization: "token " + store.token
         },
         body: JSON.stringify({
-          pk: store.id,
+          pk: store.event.id,
           invitee: this.state.username
         })
-      })
-        .then(response => response.json())
-        .then(responseJson => {
-          responseJson.non_field_errors == null
-            ? alert("Invited")
-            : alert("responseJson.non_field_errors");
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      }).catch(error => {
+        console.error(error);
+      });
+      this.props.navigation.navigate("Home");
     };
 
     render() {

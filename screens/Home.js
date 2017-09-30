@@ -51,15 +51,36 @@ const Home = observer(
             rowHasChanged: (r1, r2) => r1 !== r2
           });
           // console.log("responseJson: "+responseJson);
-          this.setState(
-            {
-              isLoading: false,
-              dataSource: ds.cloneWithRows(responseJson)
-            },
-            function() {
-              // do something with new state
-            }
-          );
+          this.setState({
+            isLoading: false,
+            dataSource: ds.cloneWithRows(responseJson)
+          });
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
+
+    componentWillUpdate() {
+      let EVENTS_URL = "http://46.101.75.135/event/";
+      return fetch(EVENTS_URL, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+          Authorization: "token " + store.token
+        }
+      })
+        .then(response => response.json())
+        .then(responseJson => {
+          let ds = new ListView.DataSource({
+            rowHasChanged: (r1, r2) => r1 !== r2
+          });
+          // console.log("responseJson: "+responseJson);
+          this.setState({
+            isLoading: false,
+            dataSource: ds.cloneWithRows(responseJson)
+          });
         })
         .catch(error => {
           console.error(error);
@@ -71,7 +92,6 @@ const Home = observer(
         <View style={styles.container}>
           <TouchableOpacity
             onPress={() => {
-              store.id = event.id;
               store.event = event;
               this.props.navigation.navigate("EventDetails");
             }}
