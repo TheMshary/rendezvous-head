@@ -12,7 +12,8 @@ import {
 	StatusBar,
 	TextInput,
 	TouchableOpacity,
-	Image
+	Image,
+	AsyncStorage
 } from 'react-native';
 import Form from 'react-native-form';
 import { BrowserRouter, Route, Link } from 'react-router-dom'
@@ -34,6 +35,7 @@ import store from './Store';
 const login = observer(class login extends React.Component {
   static navigationOptions = {
     title: "LOGIN",
+	headerLeft: null,
     headerStyle: {
 		marginTop: StatusBar.currentHeight
 	},
@@ -44,7 +46,7 @@ const login = observer(class login extends React.Component {
     message: []
   };
 
-  onPressLearnMore = () => {
+   onPressLearnMore = async () => {
     fetch("http://46.101.75.135/login/", {
       method: "POST",
       headers: {
@@ -57,7 +59,7 @@ const login = observer(class login extends React.Component {
       })
     })
       .then(response => response.json())
-      .then(responseJson => {
+      .then(async (responseJson) => {
       	// store token in store
       	store.token = responseJson.token;
         this.setState({
@@ -67,6 +69,7 @@ const login = observer(class login extends React.Component {
               ? "SUCCESSFUL"
               : responseJson.non_field_errors
         });
+		await AsyncStorage.setItem('token', responseJson.token);
 
         if (responseJson.non_field_errors == null)
           this.props.navigation.navigate("Events");
@@ -74,29 +77,24 @@ const login = observer(class login extends React.Component {
       .catch(error => {
         console.error(error);
       });
-
-    // console.log(this.state.textUser);
-    // console.log(this.state.textPass);
-    // fetch("http://46.101.75.135/event/", {
-    //   method: "GET",
-    //   headers: {
-    //     Accept: "application/json",
-    //     "Content-Type": "application/json",
-    //     "Authorization": "token beef159c35da3d31f028de76efbd434db4061c10"
-    //   }
-    // })
-    //   .then(response => response.json())
-    //   .then(responseJson => {
-    //     console.log(responseJson);
-    //   })
-    //   .catch(error => {
-    //     console.error(error);
-    //   });
   };
 
   _onPressButton = () => {
     this.props.navigation.navigate("Registration");
   };
+
+	async componentWillMount() {
+		try {
+			const token = await AsyncStorage.getItem('token');
+			if (token !== null){
+				// We have data!!
+				store.token = token;
+				this.props.navigation.navigate("Events");
+			}
+		} catch (error) {
+			console.log("ERROR: "+error);
+		}
+	}
 
   render() {
     return (
@@ -249,6 +247,7 @@ const Events = observer(class Events extends React.Component {
 
 	static navigationOptions = ({ navigation, screenProps }) => ({
 		title: 'Events',
+		headerLeft: null,
 		headerRight: <Button
 						title="new event"
 						onPress={()=>{ navigation.navigate('EventCreate'); }}
@@ -260,9 +259,12 @@ const Events = observer(class Events extends React.Component {
 
 	constructor(props) {
 		super(props);
+		let ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 		this.state = {
 			// dataSource: null,
-			isLoading: true
+			isLoading: true,
+			dataSourceCreated: ds,
+			dataSourceAttending: ds,
 		}
 	}
 
@@ -284,8 +286,6 @@ const Events = observer(class Events extends React.Component {
 			this.setState({
 				isLoading: false,
 				dataSource: ds.cloneWithRows(responseJson),
-			}, function() {
-				// do something with new state
 			});
 		})
 		.catch((error) => {
@@ -294,7 +294,7 @@ const Events = observer(class Events extends React.Component {
 
 	}
 
-	componentWillUpdate() {
+	componentDidUpdate() {
 		EVENTS_URL = "http://46.101.75.135/event/"
 		// token: beef159c35da3d31f028de76efbd434db4061c10
 		return fetch(EVENTS_URL, {
@@ -311,7 +311,8 @@ const Events = observer(class Events extends React.Component {
 			// console.log("responseJson: "+responseJson);
 			this.setState({
 				isLoading: false,
-				dataSource: ds.cloneWithRows(responseJson),
+				dataSourceCreated: ds.cloneWithRows(responseJson.created),
+				dataSourceAttending: ds.cloneWithRows(responseJson.attending),
 			}, function() {
 				// do something with new state
 			});
@@ -354,13 +355,20 @@ const Events = observer(class Events extends React.Component {
 		return (
 			<View style={{flex: 1, paddingTop: 20}}>
 				<Button
-					title="new event"
-					onPress={() =>
-						this.props.navigation.navigate('EventCreate')
-					}
+					title="Log Out and Get Out!"
+					onPress={async () => {
+						await AsyncStorage.removeItem("token");
+						this.props.navigation.navigate('login');
+					}}
 				/>
 				<ListView
-					dataSource={this.state.dataSource}
+					enableEmptySections={true}
+					dataSource={this.state.dataSourceCreated}
+					renderRow={this.renderEvent}
+				/>
+				<ListView
+					enableEmptySections={true}
+					dataSource={this.state.dataSourceAttending}
 					renderRow={this.renderEvent}
 				/>
 			</View>

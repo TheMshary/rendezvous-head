@@ -1,5 +1,17 @@
 {
-  "expo": {
-    "sdkVersion": "20.0.0"
-  }
+	"expo": {
+		"name": "Rendezvous",
+		"icon": "http://images.clipartpanda.com/rendezvous-clipart-l_132.png",
+		"version": "2.0.0",
+		"slug": "rendezvous",
+		"sdkVersion": "20.0.0",
+		"ios": {
+			"bundleIdentifier": "com.rendezvous.rendezvous"
+		},
+		"android": {
+			"package": "com.rendezvous.rendezvous2",
+			"permissions": [],
+			"versionCode": 2
+		}
+	}
 }
