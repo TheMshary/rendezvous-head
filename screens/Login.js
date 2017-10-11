@@ -9,7 +9,12 @@ import {
   Form,
   Item,
   Input,
-  Label
+  Label,
+  Spinner,
+  Footer,
+  FooterTab,
+  H3,
+  Toast
 } from "native-base";
 import Expo from "expo";
 import { observer } from "mobx-react";
@@ -17,24 +22,20 @@ import store from "../Store";
 
 const login = observer(
   class login extends React.Component {
-    static navigationOptions = ({ navigation, screenProps }) => ({
+    static navigationOptions = () => ({
       title: "Login",
-      headerRight: (
-        <Button
-          transparent
-          onPress={() => {
-            navigation.navigate("Registration");
-          }}
-        >
-          <Icon ios="ios-person-add" android="md-person-add" />
-        </Button>
-      )
+      headerStyle: {
+        marginTop: StatusBar.currentHeight
+      },
+      header: null
     });
 
-    state = {
-      token: "",
-      message: []
-    };
+    constructor(props) {
+      super(props);
+      this.state = {
+        isLoading: true
+      };
+    }
 
     onPressLearnMore = () => {
       fetch("http://46.101.75.135/login/", {
@@ -48,20 +49,23 @@ const login = observer(
           password: this.state.textPass
         })
       })
-        .then(response => response.json())
+        .then(response => {
+          this.setState({ status: response.status });
+          return response.json();
+        })
         .then(responseJson => {
-          this.setState({
-            token: responseJson.token,
-            message:
-              responseJson.non_field_errors == null
-                ? "SUCCESSFUL"
-                : responseJson.non_field_errors
-          });
-
-          store.token = responseJson.token;
-
-          if (responseJson.non_field_errors == null)
+          if (this.state.status == 200) {
+            store.token = responseJson.token;
             this.props.navigation.navigate("Home");
+          } else {
+            Toast.show({
+              text: "Wrong username/password!",
+              position: "top",
+              buttonText: "Dismiss",
+              type: "danger",
+              duration: "2200"
+            });
+          }
         })
         .catch(error => {
           console.error(error);
@@ -74,38 +78,78 @@ const login = observer(
         Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
         Ionicons: require("@expo/vector-icons/fonts/Ionicons.ttf")
       });
+      this.setState({ isLoading: false });
     }
 
     render() {
+      if (this.state.isLoading) {
+        return (
+          <Container style={{ flex: 1, paddingTop: 20 }}>
+            <Content padder>
+              <Text>Loading</Text>
+              <Spinner color="#d32f2f" />
+            </Content>
+          </Container>
+        );
+      }
+
       return (
-        <Container>
-          <Content padder>
+        <Container style={{ backgroundColor: "#e0e0e0" }}>
+          <Content
+            contentContainerStyle={{
+              flex: 1,
+              justifyContent: "center"
+            }}
+            padder
+          >
             <Form>
-              <Item floatingLabel>
-                <Label>Username</Label>
-                <Input onChangeText={textUser => this.setState({ textUser })} />
+              <Item floatingLabel style={{ borderBottomColor: "#d32f2f" }}>
+                <Icon name="contact" active={true} size={32} />
+                <Label> Username</Label>
+                <Input
+                  onChangeText={textUser =>
+                    this.setState({ textUser: textUser })}
+                />
               </Item>
-              <Item floatingLabel last>
-                <Label>Password</Label>
-                <Input onChangeText={textPass => this.setState({ textPass })} />
+              <Item floatingLabel style={{ borderBottomColor: "#d32f2f" }}>
+                <Icon name="lock" active={true} size={32} />
+                <Label> Password</Label>
+                <Input
+                  onChangeText={textPass =>
+                    this.setState({ textPass: textPass })}
+                  secureTextEntry={true}
+                />
               </Item>
+
+              <Button
+                iconLeft
+                block
+                onPress={() => {
+                  this.onPressLearnMore();
+                }}
+                style={{ marginTop: 20, backgroundColor: "#d32f2f" }}
+              >
+                <Icon name="log-in" />
+                <Text>Login</Text>
+              </Button>
             </Form>
-
-            <Button
-              block
-              onPress={() => {
-                this.onPressLearnMore();
-              }}
-            >
-              <Text>Login</Text>
-            </Button>
-
-            <Text>{this.state.message}</Text>
           </Content>
+          <Footer>
+            <FooterTab>
+              <Button
+                full
+                onPress={() => {
+                  this.props.navigation.navigate("Registration");
+                }}
+                style={{ backgroundColor: "#fff" }}
+              >
+                <H3>Sign Up</H3>
+              </Button>
+            </FooterTab>
+          </Footer>
         </Container>
       );
     }
   }
 );
-
 export default login;

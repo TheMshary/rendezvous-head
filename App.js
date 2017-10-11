@@ -5,24 +5,25 @@ import Home from "./screens/Home";
 import Registration from "./screens/Registration";
 import CreateEvent from "./screens/CreateEvent";
 import EventDetails from "./screens/EventDetails";
-import { StackNavigator } from "react-navigation";
+import { StackNavigator, DrawerNavigator } from "react-navigation";
+import { Root } from "native-base";
 
-// class App extends React.Component {
-//   render() {
-//     return <Login />;
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1
 //   }
-// }
+// });
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});
-
-export default StackNavigator({
+const App = StackNavigator({
   Login: { screen: Login },
   Registration: { screen: Registration },
   Home: { screen: Home },
   CreateEvent: { screen: CreateEvent },
-  EventDetails: {screen: EventDetails},
+  EventDetails: { screen: EventDetails }
 });
+
+export default () => (
+  <Root>
+    <App />
+  </Root>
+);

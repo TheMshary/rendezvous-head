@@ -1,23 +1,39 @@
 import React from "react";
+import { StatusBar } from "react-native";
 import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
+  Container,
   Button,
-  TouchableOpacity,
-  StatusBar
-} from "react-native";
+  Icon,
+  Content,
+  Text,
+  Form,
+  Item,
+  Input,
+  Label,
+  Spinner,
+  Footer,
+  FooterTab,
+  H3,
+  Toast
+} from "native-base";
+import store from "../Store";
 
 export default class Registration extends React.Component {
-  static navigationOptions = {
-    title: "REGISTRATION"
-  };
+  static navigationOptions = () => ({
+    title: "REGISTRATION",
+    headerTintColor: "#d32f2f",
+    headerStyle: {
+      borderBottomColor: "#d32f2f",
+      marginTop: StatusBar.currentHeight
+    }
+  });
 
-  state = {
-    token: "",
-    message: []
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: true
+    };
+  }
 
   onPressLearnMore = () => {
     fetch("http://46.101.75.135/register/", {
@@ -31,76 +47,69 @@ export default class Registration extends React.Component {
         password: this.state.textPass
       })
     })
-      .then(response => response.json())
+      .then(response => {
+        this.setState({ status: response.status });
+        return response.json();
+      })
       .then(responseJson => {
-        this.setState({
-          token: responseJson.token,
-          message:
-            responseJson.non_field_errors == null
-              ? "Registered"
-              : responseJson.non_field_errors
-        });
-
-        console.log(responseJson);
+        if (this.state.status == 200) {
+          this.props.navigation.navigate("Login");
+        } else {
+          Toast.show({
+            text: "Username Already exist!",
+            position: "bottom",
+            buttonText: "Dismiss",
+            type: "danger",
+            duration: "2200"
+          });
+        }
       })
       .catch(error => {
         console.error(error);
       });
-
-    // console.log(this.state.textUser);
-    // console.log(this.state.textPass);
-    // fetch("http://46.101.75.135/event/", {
-    //   method: "GET",
-    //   headers: {
-    //     Accept: "application/json",
-    //     "Content-Type": "application/json",
-    //     "Authorization": "token beef159c35da3d31f028de76efbd434db4061c10"
-    //   }
-    // })
-    //   .then(response => response.json())
-    //   .then(responseJson => {
-    //     console.log(responseJson);
-    //   })
-    //   .catch(error => {
-    //     console.error(error);
-    //   });
   };
 
   render() {
     return (
-      <View style={styles.container}>
-        <TextInput
-          style={{ height: 40 }}
-          placeholder="Username"
-          onChangeText={textUser => this.setState({ textUser })}
-        />
-
-        <TextInput
-          style={{ height: 40 }}
-          placeholder="Password"
-          onChangeText={textPass => this.setState({ textPass })}
-        />
-
-        <Button
-          onPress={() => {
-            this.onPressLearnMore();
+      <Container style={{ backgroundColor: "#e0e0e0" }}>
+        <Content
+          contentContainerStyle={{
+            flex: 0.9,
+            justifyContent: "center"
           }}
-          title="Register"
-          color="#841584"
-          accessibilityLabel="Learn more about this purple button"
-        />
+          padder
+        >
+          <Form>
+            <Item last style={{ borderBottomColor: "#d32f2f" }}>
+              <Icon name="contact" active={true} size={32} />
+              <Input
+                placeholder="Username"
+                onChangeText={textUser => this.setState({ textUser })}
+              />
+            </Item>
+            <Item last style={{ borderBottomColor: "#d32f2f", marginTop: 15 }}>
+              <Icon name="lock" active={true} size={32} />
+              <Input
+                placeholder=" Password"
+                onChangeText={textPass => this.setState({ textPass })}
+                secureTextEntry={true}
+              />
+            </Item>
 
-        <Text>{this.state.message}</Text>
-      </View>
+            <Button
+              iconLeft
+              block
+              onPress={() => {
+                this.onPressLearnMore();
+              }}
+              style={{ marginTop: 20, backgroundColor: "#d32f2f" }}
+            >
+              <Icon name="add-circle" />
+              <Text>Register</Text>
+            </Button>
+          </Form>
+        </Content>
+      </Container>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fafafa",
-    alignItems: "center",
-    justifyContent: "center"
-  }
-});

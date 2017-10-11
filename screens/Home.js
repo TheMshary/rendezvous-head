@@ -2,29 +2,52 @@ import React from "react";
 import {
   StyleSheet,
   ListView,
-  Text,
   View,
-  TextInput,
-  Button,
   TouchableOpacity,
   StatusBar,
-  ActivityIndicator
+  AsyncStorage
 } from "react-native";
+import {
+  Container,
+  Button,
+  Icon,
+  Content,
+  Text,
+  Form,
+  Item,
+  Input,
+  Label,
+  Spinner,
+  Footer,
+  FooterTab,
+  H3
+} from "native-base";
 import { observer } from "mobx-react";
 import store from "../Store";
 
 const Home = observer(
   class Home extends React.Component {
     static navigationOptions = ({ navigation }) => ({
-      title: "Events",
       headerRight: (
         <Button
-          title="new event"
+          transparent
           onPress={() => {
             navigation.navigate("CreateEvent");
           }}
-        />
-      )
+        >
+          <Icon
+            name="add"
+            style={{ fontSize: 35, color: "#fff", fontWeight: "bold" }}
+          />
+        </Button>
+      ),
+      headerTintColor: "#fff",
+      headerStyle: {
+        backgroundColor: "#d32f2f",
+        borderBottomColor: "#fff",
+        marginTop: StatusBar.currentHeight
+      },
+      headerLeft: null
     });
 
     constructor(props) {
@@ -36,32 +59,14 @@ const Home = observer(
     }
 
     componentDidMount() {
-      let EVENTS_URL = "http://46.101.75.135/event/";
-      return fetch(EVENTS_URL, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: "token " + store.token
-        }
-      })
-        .then(response => response.json())
-        .then(responseJson => {
-          let ds = new ListView.DataSource({
-            rowHasChanged: (r1, r2) => r1 !== r2
-          });
-          // console.log("responseJson: "+responseJson);
-          this.setState({
-            isLoading: false,
-            dataSource: ds.cloneWithRows(responseJson)
-          });
-        })
-        .catch(error => {
-          console.error(error);
-        });
+      this.fetchData();
     }
 
     componentWillUpdate() {
+      this.fetchData();
+    }
+
+    fetchData = () => {
       let EVENTS_URL = "http://46.101.75.135/event/";
       return fetch(EVENTS_URL, {
         method: "GET",
@@ -76,16 +81,16 @@ const Home = observer(
           let ds = new ListView.DataSource({
             rowHasChanged: (r1, r2) => r1 !== r2
           });
-          // console.log("responseJson: "+responseJson);
           this.setState({
             isLoading: false,
-            dataSource: ds.cloneWithRows(responseJson)
+            dataSourceCreated: ds.cloneWithRows(responseJson.created),
+            dataSourceAttending: ds.cloneWithRows(responseJson.attending)
           });
         })
         .catch(error => {
           console.error(error);
         });
-    }
+    };
 
     renderEvent = event => {
       return (
@@ -107,15 +112,29 @@ const Home = observer(
         return (
           <View style={{ flex: 1, paddingTop: 20 }}>
             <Text>Loading</Text>
-            <ActivityIndicator />
+            <Spinner color="#d32f2f" />
           </View>
         );
       }
 
       return (
         <View style={{ flex: 1, paddingTop: 20 }}>
+          <StatusBar backgroundColor="#d32f2f" barStyle="light-content" />
+          <Button
+            title="Log Out and Get Out!"
+            onPress={async () => {
+              await AsyncStorage.removeItem("token");
+              this.props.navigation.navigate("Login");
+            }}
+          />
           <ListView
-            dataSource={this.state.dataSource}
+            enableEmptySections={true}
+            dataSource={this.state.dataSourceCreated}
+            renderRow={this.renderEvent}
+          />
+          <ListView
+            enableEmptySections={true}
+            dataSource={this.state.dataSourceAttending}
             renderRow={this.renderEvent}
           />
         </View>
